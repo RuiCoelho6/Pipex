@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/09/05 14:30:17 by rpires-c          #+#    #+#              #
+#    Updated: 2024/09/05 16:15:50 by rpires-c         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = pipex
 NAME_B = pipex_bonus
 
@@ -5,10 +17,10 @@ LIBFT = ./inc/libft/libft.a
 INC = -I ./inc/libft
 RM = rm -f
 
-SRCS = pipex.c utils.c
+SRCS = pipex.c utils.c error_warnings.c
 OBJS = ${SRCS:.c=.o}
 
-SRCS_B = pipex_bonus.c utils.c utils_bonus.c
+SRCS_B = 
 OBJS_B = ${SRCS_B:.c=.o}
 
 CC = cc -g
