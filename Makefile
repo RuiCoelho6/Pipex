@@ -6,7 +6,7 @@
 #    By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/05 14:30:17 by rpires-c          #+#    #+#              #
-#    Updated: 2024/09/05 16:15:50 by rpires-c         ###   ########.fr        #
+#    Updated: 2024/09/09 11:33:50 by rpires-c         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ RM = rm -f
 SRCS = pipex.c utils.c error_warnings.c
 OBJS = ${SRCS:.c=.o}
 
-SRCS_B = 
+SRCS_B = pipex_bonus.c utils_bonus.c utils.c error_warnings.c
 OBJS_B = ${SRCS_B:.c=.o}
 
 CC = cc -g

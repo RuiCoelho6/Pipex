@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 15:50:27 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/05 16:47:36 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/09 11:45:28 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	open_file_error(void)
 
 void	no_path_error(char *cmd)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (cmd[i])
