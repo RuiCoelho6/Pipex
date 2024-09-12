@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:41 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/10 16:46:36 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/12 15:37:42 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,17 @@
 char	**get_paths_from_env(char **envp)
 {
 	int	i;
+	int	space_only;
 
+	space_only = 1;
 	i = 0;
 	while (envp[i] && ft_strnstr(envp[i], "PATH", 4) == 0)
+	{
+		if (!((*envp[i] >= 9 && *envp[i] <= 13) || *envp[i] == 32))
+			space_only = 0;
 		i++;
-	if (!envp[i])
+	}
+	if (!envp[i] || space_only == 1)
 		return (NULL);
 	return ft_split(envp[i] + 5, ':');
 }
@@ -30,6 +36,7 @@ char	*build_and_check_path(char *path, char *cmd)
 	char	*full_path;
 
 	part_path = ft_strjoin(path, "/");
+
 	full_path = ft_strjoin(part_path, cmd);
 	free(part_path);
 	if (access(full_path, F_OK) == 0)

@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:31 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/05 16:46:31 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/12 14:44:54 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,13 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include "inc/libft/libft.h"
+
+typedef struct s_btree
+{
+    char *cmd;
+    struct s_btree *left;
+    struct s_btree *right;
+} t_btree;
 
 void	fork_error(void);
 void	pipe_error(void);

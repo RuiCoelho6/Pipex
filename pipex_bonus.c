@@ -6,35 +6,11 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 11:26:18 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/09 11:26:22 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/11 15:29:32 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-void	child_process(char *argv, char **envp)
-{
-	pid_t	pid;
-	int		fd[2];
-
-	if (pipe(fd) == -1)
-		pipe_error();
-	pid = fork();
-	if (pid == -1)
-		fork_error();
-	if (pid == 0)
-	{
-		close(fd[0]);
-		dup2(fd[1], STDOUT_FILENO);
-		execute(argv, envp);
-	}
-	else
-	{
-		close(fd[1]);
-		dup2(fd[0], STDIN_FILENO);
-		waitpid(pid, NULL, 0);
-	}
-}
 
 void	here_doc(char *limiter, int argc)
 {
@@ -62,6 +38,30 @@ void	here_doc(char *limiter, int argc)
 		close(fd[1]);
 		dup2(fd[0], STDIN_FILENO);
 		wait(NULL);
+	}
+}
+
+void	child_process(char *argv, char **envp)
+{
+	pid_t	pid;
+	int		fd[2];
+
+	if (pipe(fd) == -1)
+		pipe_error();
+	pid = fork();
+	if (pid == -1)
+		fork_error();
+	if (pid == 0)
+	{
+		close(fd[0]);
+		dup2(fd[1], STDOUT_FILENO);
+		execute(argv, envp);
+	}
+	else
+	{
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+		waitpid(pid, NULL, 0);
 	}
 }
 

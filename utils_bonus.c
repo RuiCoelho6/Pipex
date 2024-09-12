@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 11:26:26 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/09 11:41:35 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/12 15:30:42 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,16 +50,13 @@ int	get_next_line(char **line)
 	if (!buffer)
 		return (-1);
 	r = read(0, &c, 1);
-	while (r && c != '\n' && c != '\0')
+	while (r > 0 && c != '\n' && c != '\0')
 	{
-		if (c != '\n' && c != '\0')
-			buffer[i] = c;
-		i++;
+		buffer[i++] = c;
 		r = read(0, &c, 1);
 	}
 	buffer[i] = '\n';
 	buffer[++i] = '\0';
 	*line = buffer;
-	free(buffer);
 	return (r);
 }
