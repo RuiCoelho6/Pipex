@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/13 13:36:05 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/13 16:31:30 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,13 @@ t_btree *build_tree(char **argv, int start, int end)
     return root;
 }
 
-void process_tree(t_btree *node, char **envp)
+void process_tree(char  **argv, t_btree *node, char **envp)
 {
     int fd[2];
     pid_t pid;
-    
+    int filein = 0;
+    int fileout;
+
 	if (node == NULL)
         return;
 	if (pipe(fd) == -1)
@@ -62,13 +64,20 @@ void process_tree(t_btree *node, char **envp)
             close(fd[0]);
             dup2(fd[1], STDOUT_FILENO);
             if (node->left)
-                process_tree(node->left, envp);
+                process_tree(argv, node->left, envp);
             if (node->right)
-                process_tree(node->right, envp);
+                process_tree(argv, node->right, envp);
         }
     }
     else
     {
+        int i = 0;
+        while(argv[i])
+            i++;
+        filein = open_file(argv[1], 2);
+        fileout = open_file(argv[i - 1], 1);
+        dup2(filein, STDIN_FILENO);
+        dup2(fileout, STDOUT_FILENO);
         close(fd[1]);
         dup2(fd[0], STDIN_FILENO);
         waitpid(pid, NULL, 0);
@@ -110,25 +119,19 @@ void	here_doc(char *limiter, int argc)
 
 int main(int argc, char **argv, char **envp)
 {
-    int filein;
-    int fileout;
     t_btree *root;
 
     if (argc >= 5)
     {
-        if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+        /* if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 		{
 			fileout = open_file(argv[argc - 1], 0);
 			here_doc(argv[2], argc);
 		}
-        else
+        else */
         {
-            filein = open_file(argv[1], 2);
-            fileout = open_file(argv[argc - 1], 1);
-            dup2(filein, STDIN_FILENO);
             root = build_tree(argv, 2, argc - 2);
-            process_tree(root, envp);
-            dup2(fileout, STDOUT_FILENO);
+            process_tree(argv, root, envp);
             execute(argv[argc - 2], envp);
         }
     }

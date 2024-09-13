@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 11:26:26 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/13 13:34:32 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/13 14:54:04 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void	usage(void)
 {
-	ft_putstr_fd("Error: Bad arguments", 2);
-	ft_putstr_fd("Ex: ./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 1);
-	ft_putstr_fd("./pipex \"here_doc\" <LIMITER>", 1);
-	ft_putstr_fd(" <cmd> <cmd1> <...> <file>\n", 1);
+	ft_putstr_fd("Error: Bad arguments\n", 2);
+	ft_putstr_fd("Ex: ./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 2);
+	ft_putstr_fd("./pipex \"here_doc\" <LIMITER>", 2);
+	ft_putstr_fd(" <cmd> <cmd1> <...> <file>\n", 2);
 	exit(EXIT_SUCCESS);
 }
 
