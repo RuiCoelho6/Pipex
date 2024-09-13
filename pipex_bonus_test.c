@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/12 15:34:35 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/13 13:36:05 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,10 @@ void	here_doc(char *limiter, int argc)
 	if (pipe(fd) == -1)
 		pipe_error();
 	reader = fork();
+    if (reader == -1)
+    {
+        fork_error();
+    }
 	if (reader == 0)
 	{
 		close(fd[0]);
@@ -98,7 +102,7 @@ void	here_doc(char *limiter, int argc)
 	}
 	else
 	{
-		close(fd[1]);	
+		close(fd[1]);
 		dup2(fd[0], STDIN_FILENO);
 		wait(NULL);
 	}
@@ -113,10 +117,10 @@ int main(int argc, char **argv, char **envp)
     if (argc >= 5)
     {
         if (ft_strncmp(argv[1], "here_doc", 8) == 0)
-        {
+		{
 			fileout = open_file(argv[argc - 1], 0);
 			here_doc(argv[2], argc);
-        }
+		}
         else
         {
             filein = open_file(argv[1], 2);
