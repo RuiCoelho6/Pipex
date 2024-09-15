@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus_test.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/13 16:31:30 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/15 18:33:19 by rui              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,49 +37,60 @@ t_btree *build_tree(char **argv, int start, int end)
     return root;
 }
 
-void process_tree(char  **argv, t_btree *node, char **envp)
+void process_tree(char **argv, t_btree *node, char **envp, int *is_first_command)
 {
     int fd[2];
     pid_t pid;
-    int filein = 0;
+    int filein;
     int fileout;
 
-	if (node == NULL)
+    if (node == NULL)
         return;
-	if (pipe(fd) == -1)
+    if (pipe(fd) == -1)
         pipe_error();
     pid = fork();
     if (pid == -1)
         fork_error();
-    if (pid == 0)
+    if (pid == 0) 
     {
-        if (node->left == NULL && node->right == NULL)
+        if (node->left == NULL && node->right == NULL) 
         {
+            if (*is_first_command)
+            {
+                filein = open_file(argv[1], 2); 
+                if (filein == -1)
+                    open_file_error();
+                dup2(filein, STDIN_FILENO); 
+                close(filein);              
+                *is_first_command = 0;    
+            }
             dup2(fd[1], STDOUT_FILENO);
             close(fd[0]);
-            execute(node->cmd, envp);
+            execute(node->cmd, envp); 
         }
-        else
+        else 
         {
-            close(fd[0]);
+            close(fd[0]);              
             dup2(fd[1], STDOUT_FILENO);
             if (node->left)
-                process_tree(argv, node->left, envp);
+                process_tree(argv, node->left, envp, is_first_command);
             if (node->right)
-                process_tree(argv, node->right, envp);
+                process_tree(argv, node->right, envp, is_first_command);
         }
     }
-    else
+    else 
     {
         int i = 0;
-        while(argv[i])
+        while (argv[i])
             i++;
-        filein = open_file(argv[1], 2);
-        fileout = open_file(argv[i - 1], 1);
-        dup2(filein, STDIN_FILENO);
+        fileout = open_file(argv[i - 1], 1); 
+        if (fileout == -1)
+            open_file_error();
         dup2(fileout, STDOUT_FILENO);
-        close(fd[1]);
-        dup2(fd[0], STDIN_FILENO);
+        close(fileout);
+        close(fd[1]);            
+        dup2(fd[0], STDIN_FILENO); 
+        close(fd[0]);
         waitpid(pid, NULL, 0);
     }
 }
@@ -89,7 +100,7 @@ void	here_doc(char *limiter, int argc)
 	pid_t	reader;
 	int		fd[2];
 	char	*line;
-
+    
 	if (argc < 6)
 		usage();
 	if (pipe(fd) == -1)
@@ -120,7 +131,9 @@ void	here_doc(char *limiter, int argc)
 int main(int argc, char **argv, char **envp)
 {
     t_btree *root;
+    int first_cmd_flag;
 
+    first_cmd_flag = 1;
     if (argc >= 5)
     {
         /* if (ft_strncmp(argv[1], "here_doc", 8) == 0)
@@ -131,7 +144,7 @@ int main(int argc, char **argv, char **envp)
         else */
         {
             root = build_tree(argv, 2, argc - 2);
-            process_tree(argv, root, envp);
+            process_tree(argv, root, envp, &first_cmd_flag);
             execute(argv[argc - 2], envp);
         }
     }
