@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/17 14:59:58 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/17 16:25:37 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/17 17:01:42 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,75 +15,105 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int word_count(const char *str, char c)
+int	count_quotes(const char *str)
 {
-    int i = 0;
-    int flag = 0;
-    int n_words = 0;
+	int	quote_counter;
+	int i;
 
-    while (str[i] != '\0')
-    {
-        if (str[i] != c && flag == 0)
-        {
-            flag = 1;
-            n_words++;
-        }
-        else if (str[i] == c)
-            flag = 0;
-        i++;
-    }
-    return n_words;
+	quote_counter = 0;
+	i = -1;
+	while (str[++i] != 0)
+	{
+		if (str[i] == '\'')
+			quote_counter++;
+	}
+	return (quote_counter / 2);
 }
 
-static char *str_length(const char *str, int start, int end)
+static int	word_count(const char *str, char c)
 {
-    char *word;
-    int i = 0;
+	int	i;
+	int	flag;
+	int	n_words;
+	int inside_quotes;
 
-    word = (char *)calloc((end - start + 1), sizeof(char));
-    while (start < end)
-        word[i++] = str[start++];
-    word[i] = '\0';
-    return word;
+	i = 0;
+	flag = 0;
+	n_words = 0;
+	inside_quotes = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '\'')
+			inside_quotes = !inside_quotes;
+
+		if (str[i] != c && flag == 0 && !inside_quotes)
+		{
+			flag = 1;
+			n_words++;
+		}
+		else if (str[i] == c && !inside_quotes)
+			flag = 0;
+		i++;
+	}
+	return (n_words);
 }
 
-char **ft_split(char const *s, char c)
+static char	*str_length(const char *str, int start, int end)
 {
-    size_t i = 0;
-    size_t j = 0;
-    int index = -1;
-    char **res;
+	char	*word;
+	int		i;
 
-    res = (char **)calloc((word_count(s, c) + 1), sizeof(char *));
-    if (!s || !res)
-        return NULL;
-
-    while (i <= strlen(s))
-    {
-        if (s[i] != c && index < 0)
-            index = i;
-        else if ((s[i] == c || i == strlen(s)) && index >= 0)
-        {
-            res[j++] = str_length(s, index, i);
-            index = -1;
-        }
-        i++;
-    }
-    res[j] = 0;
-    return res;
+	i = 0;
+	word = (char *)calloc((end - start + 1), sizeof(char));
+	while (start < end)
+		word[i++] = str[start++];
+	word[i] = '\0';
+	return (word);
 }
 
-int main()
+char	**ft_split(char const *s, char c)
 {
-    char **res;
-    int i = 0;
+	size_t	i;
+	size_t	j;
+	int		index;
+	int		inside_quotes;
+	char	**res;
 
-    res = ft_split("lorem ipsum \"dolor sit\" amet", ' ');
+	i = 0;
+	j = 0;
+	index = -1;
+	inside_quotes = 0;
+	res = (char **)calloc((word_count(s, c) + 1), sizeof(char *));
+	if (!s || !res)
+		return (NULL);
+	while (i <= strlen(s))
+	{
+		if (s[i] == '\'')
+			inside_quotes = 1;
+		if (s[i] != c && index < 0)
+			index = i;
+		else if ((s[i] == c || i == strlen(s)) && index >= 0 && inside_quotes == 1)
+		{
+			res[j++] = str_length(s, index, i);
+			index = -1;
+		}
+		i++;
+	}
+	res[j] = 0;
+	return (res);
+}
 
-    while (res[i])
-    {
-        printf("%s\n", res[i]);
-        i++;
-    }
-    return 0;
+int	main(void)
+{
+	char	**res;
+	int		i;
+
+	i = 0;
+	res = ft_split("lorem ipsum 'dolor sit' amet", ' ');
+	while (res[i])
+	{
+		printf("%s\n", res[i]);
+		i++;
+	}
+	return (0);
 }
