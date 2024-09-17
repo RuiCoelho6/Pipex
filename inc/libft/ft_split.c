@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/17 12:44:08 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/05/13 13:17:22 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/17 16:34:30 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static char	*str_length(const char *str, int start, int end)
 	int		i;
 
 	i = 0;
-	word = ft_calloc((end - start + 1), sizeof(char));
+	word = (char *)ft_calloc((end - start + 1), sizeof(char));
 	while (start < end)
 		word[i++] = str[start++];
 	word[i] = '\0';
@@ -55,12 +55,12 @@ char	**ft_split(char const *s, char c)
 	int		index;
 	char	**res;
 
-	res = ft_calloc((word_count(s, c) + 1), sizeof(char *));
-	if (!s || !(res))
-		return (NULL);
 	i = 0;
 	j = 0;
 	index = -1;
+	res = (char **)ft_calloc((word_count(s, c) + 1), sizeof(char *));
+	if (!s || !res)
+		return (NULL);
 	while (i <= ft_strlen(s))
 	{
 		if (s[i] != c && index < 0)
@@ -76,18 +76,17 @@ char	**ft_split(char const *s, char c)
 	return (res);
 }
 
-//int main()
-//{
-//    int i;
+/* int	main(void)
+{
+	char	**res;
+	int		i;
 
-//    i = 0;
-//    char **res;
-
-//    res = ft_split("lorem ipsum dolor sit amet", 'i');
-//    while(res[i])
-//    {
-//       printf("%s\n", res[i]);
-//       i++;
-//    }
-//    return(0);
-//}
+	i = 0;
+	res = ft_split("lorem ipsum \"dolor sit\" amet", ' ');
+	while (res[i])
+	{
+		printf("%s\n", res[i]);
+		i++;
+	}
+	return (0);
+} */

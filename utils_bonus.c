@@ -6,7 +6,7 @@
 /*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 11:26:26 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/15 18:36:23 by rui              ###   ########.fr       */
+/*   Updated: 2024/09/17 12:19:23 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	open_file(char *argv, int i)
 	if (i == 0)
 		file = open(argv, O_WRONLY | O_CREAT | O_APPEND, 0777);
 	else if (i == 1)
-		file = open(argv, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+		file = open(argv, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else if (i == 2)
 		file = open(argv, O_RDONLY, 0777);
 	if (file == -1)

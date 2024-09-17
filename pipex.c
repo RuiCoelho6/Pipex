@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:26 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/13 14:56:07 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/17 12:13:43 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	main(int argc, char **argv, char **envp)
 			fork_error();
 		if (pid1 == 0)
 			child_process(argv, envp, fd);
-		waitpid(pid1, NULL, 0);
+		waitpid(pid1, NULL, WNOHANG);
 		parent_process(argv, envp, fd);
 	}
 	else
