@@ -6,22 +6,32 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/17 11:52:57 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/18 16:42:18 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-t_btree *create_node(char *cmd)
+t_btree *create_node(char *cmd/*, t_btree *l, t_btree *r*/)
 {
     t_btree *new_node = malloc(sizeof(t_btree));
     if (!new_node)
         return NULL;
     new_node->cmd = cmd;
-    new_node->left = NULL;
-    new_node->right = NULL;
+    new_node->left = NULL;//l;
+    new_node->right = NULL;//r;
     return new_node;
 }
+
+/*t_btree *build_tree(char **argv, int i, int end)
+{
+    t_btree *node;
+    
+    node = create_node(argv[i], NULL, NULL);
+    if (i < end)
+        node = create_node(NULL, node, build_tree(argv, i+1, end));
+    return (node);
+}*/
 
 t_btree *build_tree(char **argv, int start, int end)
 {
@@ -37,7 +47,7 @@ t_btree *build_tree(char **argv, int start, int end)
     return root;
 }
 
-void process_tree(char **argv, t_btree *node, char **envp, int *is_first_command, int *is_last_command)
+void process_tree(char **argv, t_btree *node, char **envp, int *is_first_command)
 {
     int fd[2];
     pid_t pid;
@@ -46,56 +56,52 @@ void process_tree(char **argv, t_btree *node, char **envp, int *is_first_command
 
     if (node == NULL)
         return;
-    if (!*is_last_command && pipe(fd) == -1)
+    if (pipe(fd) == -1)
         pipe_error();
     pid = fork();
     if (pid == -1)
         fork_error();
-    if (pid == 0)
+    if (pid == 0) 
     {
-        if (node->left == NULL && node->right == NULL)
+        if (node->left == NULL && node->right == NULL) 
         {
             if (*is_first_command)
             {
                 filein = open_file(argv[1], 2); 
                 if (filein == -1)
                     open_file_error();
-                dup2(filein, STDIN_FILENO);
-                close(filein);              
-                *is_first_command = 0;    
+                dup2(filein, STDIN_FILENO); 
+                close(filein);         
+                *is_first_command = 0; 
             }
-            if (!*is_last_command)
+            else
             {
                 dup2(fd[1], STDOUT_FILENO);
                 close(fd[0]);
             }
-            else
-            {
-                fileout = open_file(argv[1 + argc - 1], 1);
-                if (fileout == -1)
-                    open_file_error();
-                dup2(fileout, STDOUT_FILENO);
-                close(fileout);
-            }
-            execute(node->cmd, envp);
+            execute(node->cmd, envp);  
         }
-        else
+        else 
         {
-            close(fd[0]);
+            close(fd[0]);              
             dup2(fd[1], STDOUT_FILENO);
             if (node->left)
-                process_tree(argv, node->left, envp, is_first_command, is_last_command);
+                process_tree(argv, node->left, envp, is_first_command);
             if (node->right)
-                process_tree(argv, node->right, envp, is_first_command, is_last_command);
+                process_tree(argv, node->right, envp, is_first_command);
         }
     }
-    else
+    else 
     {
-        if (!*is_last_command)
-        {
-            close(fd[1]);
-            dup2(fd[0], STDIN_FILENO);
-        }
+        while (*argv)
+            argv++;
+        fileout = open_file(*(argv - 1), 1);  
+        if (fileout == -1)
+            open_file_error();
+        dup2(fileout, STDOUT_FILENO);
+        close(fileout);
+        close(fd[1]);            
+        dup2(fd[0], STDIN_FILENO);
         close(fd[0]);
         waitpid(pid, NULL, 0);
     }
