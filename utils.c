@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:41 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/12 15:37:42 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/19 20:23:35 by rui              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ char	**get_paths_from_env(char **envp)
 	}
 	if (!envp[i] || space_only == 1)
 		return (NULL);
-	return ft_split(envp[i] + 5, ':');
+	return pipex_split(envp[i] + 5, ':');
 }
 
 char	*build_and_check_path(char *path, char *cmd)

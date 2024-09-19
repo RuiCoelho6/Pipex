@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+         #
+#    By: rui <rui@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/05 14:30:17 by rpires-c          #+#    #+#              #
-#    Updated: 2024/09/17 11:54:05 by rpires-c         ###   ########.fr        #
+#    Updated: 2024/09/19 20:26:32 by rui              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,10 +17,10 @@ LIBFT = ./inc/libft/libft.a
 INC = -I ./inc/libft
 RM = rm -f
 
-SRCS = pipex.c utils.c error_warnings.c
+SRCS = pipex.c utils.c error_warnings.c pipex_split.c
 OBJS = ${SRCS:.c=.o}
 
-SRCS_B = pipex_bonus.c utils_bonus.c utils.c error_warnings.c
+SRCS_B = pipex_bonus.c utils_bonus.c utils.c error_warnings.c pipex_split.c
 OBJS_B = ${SRCS_B:.c=.o}
 
 CC = cc -g

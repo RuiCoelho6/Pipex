@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:31 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/12 14:44:54 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/19 20:23:42 by rui              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ char	*find_path(char *cmd, char **envp);
 int		get_next_line(char **line);
 void	execute(char *argv, char **envp);
 int		open_file(char *argv, int i);
+char    **pipex_split(char const *s, char c);
 void	usage(void);
 
 #endif
