@@ -6,7 +6,7 @@
 /*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/23 16:50:56 by rui              ###   ########.fr       */
+/*   Updated: 2024/09/23 16:52:45 by rui              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,6 @@ void print_tree(t_btree *node)
     printf("Right child: %s\n", (node->right && node->right->cmd) ? node->right->cmd : "(null)");
     printf("\n");
 
-    // Recursively print left and right children
     print_tree(node->left);
     print_tree(node->right);
 }
@@ -207,7 +206,7 @@ int main(int argc, char **argv, char **envp)
     {
 		root = build_tree(argv, 2, argc - 2);
         print_tree(root);
-        printf("--------------------------------");
+        printf("--------------------------------\n");
         process_tree(argv, root, envp);
         execute(argv[argc - 2], envp);
     }
