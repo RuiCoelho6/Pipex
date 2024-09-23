@@ -6,7 +6,7 @@
 /*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/23 16:45:00 by rui              ###   ########.fr       */
+/*   Updated: 2024/09/23 16:50:56 by rui              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ t_btree *build_tree(char **argv, int i, int end)
 
     if (i == 2)
         node = create_node(argv[i], NULL, NULL, 1);
-    else if (i == end - 1)
+    else if (i == end)
         node = create_node(argv[i], NULL, NULL, 2);
     else
         node = create_node(argv[i], NULL, NULL, 0);
@@ -182,6 +182,23 @@ void process_tree(char **argv, t_btree *node, char **envp)
     }
 }
 
+void print_tree(t_btree *node)
+{
+    if (node == NULL)
+        return;
+
+    printf("Node cmd: %s\n", node->cmd ? node->cmd : "(null)");
+    printf("First command flag: %d\n", node->first_cmd);
+    printf("Left child: %s\n", (node->left && node->left->cmd) ? node->left->cmd : "(null)");
+    printf("Right child: %s\n", (node->right && node->right->cmd) ? node->right->cmd : "(null)");
+    printf("\n");
+
+    // Recursively print left and right children
+    print_tree(node->left);
+    print_tree(node->right);
+}
+
+
 int main(int argc, char **argv, char **envp)
 {
     t_btree *root;
@@ -189,6 +206,8 @@ int main(int argc, char **argv, char **envp)
     if (argc >= 5)
     {
 		root = build_tree(argv, 2, argc - 2);
+        print_tree(root);
+        printf("--------------------------------");
         process_tree(argv, root, envp);
         execute(argv[argc - 2], envp);
     }
