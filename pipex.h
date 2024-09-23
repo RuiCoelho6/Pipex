@@ -6,7 +6,7 @@
 /*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:31 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/19 20:23:42 by rui              ###   ########.fr       */
+/*   Updated: 2024/09/22 20:32:41 by rui              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 typedef struct s_btree
 {
     char *cmd;
+    int first_cmd;
     struct s_btree *left;
     struct s_btree *right;
 } t_btree;

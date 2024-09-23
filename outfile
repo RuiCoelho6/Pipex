@@ -1,0 +1,3 @@
+Child:  redirecting stdout to output file fd: 9
+Child:  closing output file: outfile | output file fd: 9
+Child:  executing command: grep duck
