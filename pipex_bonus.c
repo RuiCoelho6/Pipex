@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/24 11:44:18 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/24 16:57:41 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,25 @@ t_btree *build_tree(char **argv, int i, int end)
     return (node);
 }
 
+void    treat_left_cmd(char **argv, t_btree *node, char **envp, int *fd)
+{
+    int		infile;
+
+    if (node->first_cmd == 1)
+    {
+        infile = open_file(argv[1], 2);
+        if (dup2(fd[0], STDIN_FILENO) == -1)
+        {
+    	    perror("First file dup2 stdin failed");
+            exit(EXIT_FAILURE);
+        }
+		close(infile);
+    }
+	else
+		close(fd[0]);
+	execute(node->cmd, envp);
+}
+
 void process_tree(char **argv, t_btree *node, char **envp)
 {
     int fd[2];
@@ -108,101 +127,31 @@ void process_tree(char **argv, t_btree *node, char **envp)
     int filein;
     int fileout;
 
-    printf("\n");
     if (pipe(fd) == -1)
         pipe_error();
-        
     pid = fork();
     if (pid == -1)
         fork_error();
-    if (pid == 0)
-    {
-        printf("Child:  command: %s | number: %d\n", node->cmd, node->first_cmd);
-        if (node->cmd != NULL)
-        {
-            if (node->left == NULL && node->right == NULL)
-            {
-                // Treating from where to input
-                if (node->first_cmd == 1)
-                {
-                    filein = open_file(argv[1], 2);
-                    printf("Child:  opening input file: %s | input file fd: %d\n", argv[1], filein);
-                    if (dup2(filein, STDIN_FILENO) ==  -1)
-                    {
-                        perror("dup2 stdin failed");
-                        exit(EXIT_FAILURE);
-                    }
-                    printf("Child:  redirecting stdin to input file fd: %d\n", filein);
-                    close(filein);
-                    printf("Child:  closing input file: %s | input file fd: %d\n", argv[1], filein);
-                }
-                else
-                {
-                    if (dup2(fd[0], STDIN_FILENO) == -1)
-                    {
-                        perror("dup2 stdin failed");
-                        exit(EXIT_FAILURE);
-                    }
-                    printf("Child:  redirecting stdin to pipe fd[0]\n");
-                    close(fd[0]);
-                    close(fd[1]);
-                    printf("Child:  closing fd[0] and fd[1]\n");
-                }
-                // Treating for where to output
-                if (node->first_cmd == 2)
-                {
-                    while (*argv)
-                        argv++;
-                    fileout = open_file(*(argv - 1), 1);
-                    printf("Child:  opening output file: %s | output file fd: %d\n", *(argv - 1), fileout);
-                    if (dup2(fileout, STDOUT_FILENO) == -1)
-                    {
-                        perror("dup2 stdin failed");
-                        exit(EXIT_FAILURE);
-                    }
-                    printf("Child:  redirecting stdout to output file fd: %d\n", fileout);
-                    close(fileout);
-                    printf("Child:  closing output file: %s | output file fd: %d\n", *(argv - 1), fileout);
-                }
-                else
-                {
-                    if (dup2(fd[1], STDOUT_FILENO) == -1)
-                    {
-                        perror("dup2 stdout failed");
-                        exit(EXIT_FAILURE);
-                    }
-                    close(fd[1]);
-                    printf("Child:  redirecting stdout to pipe: fd[1]\n");
-                }
-                printf("Child:  executing command: %s\n", node->cmd);
-                execute(node->cmd, envp);
-            }
-        }
-        else
-        {
-            printf("Child:  processing subtree block\n");
-            if (node->left)
-            {
-                printf("Child:  processing left subtree\n");
-                process_tree(argv, node->left, envp);
-            }
-            if (node->right)
-            {
-                printf("Child:  processing right subtree\n");
-                process_tree(argv, node->right, envp);
-            }
-        }
-        exit(EXIT_SUCCESS);
-    }
+	if (pid = 0)
+	{
+		if(node->left->cmd != NULL && node->right->cmd == NULL)
+		{
+			if (dup2(fd[1], STDOUT_FILENO) == -1)
+			{
+				perror("dup2 stdout failed");
+				exit(EXIT_FAILURE);
+			}
+			close(fd[1]);
+			treat_left_cmd(argv, node->left, envp, fd);
+		}
+		exit(EXIT_SUCCESS);
+	}
     else
-    {
-        close(fd[0]);
-        close(fd[1]);
-        printf("Parent: closing both pipe ends\n");
-        printf("Parent: waiting for child\n");
-        waitpid(pid, NULL, 0);
-        printf("Parent: child process finished\n");
-    }
+	{
+		waitpid(pid, NULL, 0);
+		if (node->right)
+    		process_tree(argv, node->right, envp);
+	}
 }
 
 void print_tree(t_btree *node)
