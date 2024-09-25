@@ -6,14 +6,13 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/24 16:57:41 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/25 15:34:29 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-/*
-Funny tree builder
+/* Funny tree builder
 
 t_btree *build_tree(char **argv, int start, int end)
 {
@@ -101,11 +100,17 @@ t_btree *build_tree(char **argv, int i, int end)
     return (node);
 }
 
-void    treat_left_cmd(char **argv, t_btree *node, char **envp, int *fd)
+void    treat_left(char **argv, t_btree *node, char **envp, int *fd)
 {
     int		infile;
 
-    if (node->first_cmd == 1)
+	if (dup2(fd[1], STDOUT_FILENO) == -1)
+	{
+		perror("dup2 stdout failed");
+		exit(EXIT_FAILURE);
+	}
+	close(fd[1]);
+	if (node->first_cmd == 1)
     {
         infile = open_file(argv[1], 2);
         if (dup2(fd[0], STDIN_FILENO) == -1)
@@ -115,67 +120,39 @@ void    treat_left_cmd(char **argv, t_btree *node, char **envp, int *fd)
         }
 		close(infile);
     }
-	else
-		close(fd[0]);
+	close(fd[0]);
 	execute(node->cmd, envp);
 }
 
 void process_tree(char **argv, t_btree *node, char **envp)
 {
     int fd[2];
-    pid_t pid;
+    pid_t pid1;
     int filein;
     int fileout;
 
-    if (pipe(fd) == -1)
+	if (pipe(fd) == -1)
         pipe_error();
-    pid = fork();
-    if (pid == -1)
-        fork_error();
-	if (pid = 0)
+	pid1 = fork();
+	if (pid1 == -1)
+		fork_error();
+	if(pid1 == 0)
+		// Redirects stdin to infile and closes infile if it's the first node and closes fd[0]
+		// Redirects stdout to fd[1] of the inherited pipe and closes fd[1]
+		// Executes the command
+		treat_left(argv, node->left, envp, fd);
+	else
 	{
-		if(node->left->cmd != NULL && node->right->cmd == NULL)
+		if (dup2(fd[0], STDIN_FILENO) == -1)
 		{
-			if (dup2(fd[1], STDOUT_FILENO) == -1)
-			{
-				perror("dup2 stdout failed");
-				exit(EXIT_FAILURE);
-			}
-			close(fd[1]);
-			treat_left_cmd(argv, node->left, envp, fd);
+			perror("dup2 stdin failed");
+			exit(EXIT_FAILURE);
 		}
-		exit(EXIT_SUCCESS);
+		close(fd[0]);
+		close(fd[1]);
+		if (node->right->cmd == NULL)
+			process_tree(argv, node->right, envp);
 	}
-    else
-	{
-		waitpid(pid, NULL, 0);
-		if (node->right)
-    		process_tree(argv, node->right, envp);
-	}
-}
-
-void print_tree(t_btree *node)
-{
-    if (node == NULL)
-        return;
-
-    printf("Node cmd: %s\n", node->cmd ? node->cmd : "(null)");
-    printf("First command flag: %d\n", node->first_cmd);
-    printf("Left child: %s\n", (node->left && node->left->cmd) ? node->left->cmd : "(null)");
-    printf("Right child: %s\n", (node->right && node->right->cmd) ? node->right->cmd : "(null)");
-    printf("\n");
-
-    print_tree(node->left);
-    print_tree(node->right);
-}
-
-void free_tree(t_btree *node)
-{
-    if (node == NULL)
-        return;
-    free_tree(node->left);
-    free_tree(node->right);
-    free(node);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -185,8 +162,6 @@ int main(int argc, char **argv, char **envp)
     if (argc >= 5)
     {
         root = build_tree(argv, 2, argc - 2);
-        print_tree(root);
-        printf("--------------------------------\n");
         process_tree(argv, root, envp);
         free_tree(root);
     }
