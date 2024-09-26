@@ -1,3 +1,0 @@
-Child:  redirecting stdout to output file fd: 5
-Child:  closing output file: outfile | output file fd: 5
-Child:  executing command: cat

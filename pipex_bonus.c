@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/25 15:34:29 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/26 17:10:14 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,15 @@ void    here_doc(char *limiter, int argc)
     }
 }
 
+void free_tree(t_btree *node)
+{
+    if (node == NULL)
+        return;
+    free_tree(node->left);
+    free_tree(node->right);
+    free(node);
+}
+
 t_btree *create_node(char *cmd, t_btree *l, t_btree *r, int first_cmd)
 {
     t_btree *new_node;
@@ -106,7 +115,7 @@ void    treat_left(char **argv, t_btree *node, char **envp, int *fd)
 
 	if (dup2(fd[1], STDOUT_FILENO) == -1)
 	{
-		perror("dup2 stdout failed");
+		perror("Child dup2 stdout failed");
 		exit(EXIT_FAILURE);
 	}
 	close(fd[1]);
@@ -124,12 +133,28 @@ void    treat_left(char **argv, t_btree *node, char **envp, int *fd)
 	execute(node->cmd, envp);
 }
 
+void    treat_right(char **argv, t_btree *node, char **envp, int *fd)
+{
+    int	outfile;
+    
+	while (*argv)
+        argv++;
+    outfile = open_file(*(argv - 1), 1);
+    if (dup2(outfile, STDOUT_FILENO) == -1)
+    {
+        perror("Last file dup2 stdout failed");
+        exit(EXIT_FAILURE);
+    }
+    close(outfile);
+    close(fd[0]);
+    close(fd[1]);
+	execute(node->cmd, envp);
+}
+
 void process_tree(char **argv, t_btree *node, char **envp)
 {
     int fd[2];
     pid_t pid1;
-    int filein;
-    int fileout;
 
 	if (pipe(fd) == -1)
         pipe_error();
@@ -137,22 +162,22 @@ void process_tree(char **argv, t_btree *node, char **envp)
 	if (pid1 == -1)
 		fork_error();
 	if(pid1 == 0)
-		// Redirects stdin to infile and closes infile if it's the first node and closes fd[0]
-		// Redirects stdout to fd[1] of the inherited pipe and closes fd[1]
-		// Executes the command
-		treat_left(argv, node->left, envp, fd);
+        if (node->right->cmd == NULL)
+            treat_left(argv, node->left, envp, fd);
+        else
+            treat_right(argv, node->right, envp, fd);
 	else
 	{
 		if (dup2(fd[0], STDIN_FILENO) == -1)
-		{
-			perror("dup2 stdin failed");
-			exit(EXIT_FAILURE);
-		}
-		close(fd[0]);
-		close(fd[1]);
-		if (node->right->cmd == NULL)
-			process_tree(argv, node->right, envp);
-	}
+        {
+            perror("Pipe dup2 stdin failed");
+            exit(EXIT_FAILURE);
+        }
+        close(fd[0]);
+        close(fd[1]);
+        if (node->right->cmd == NULL)
+            process_tree(argv, node->right, envp);
+    }
 }
 
 int main(int argc, char **argv, char **envp)
