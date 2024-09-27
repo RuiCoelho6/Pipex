@@ -123,14 +123,14 @@ void process_tree(char **argv, t_btree *node, char **envp, int argc)
         if (pid == -1)
             fork_error();
         
-        if (pid == 0) // Child process
+        if (pid == 0)
         {
             close(fd[0]);
             dup2(fd[1], STDOUT_FILENO);
             close(fd[1]);
             process_tree(argv, node->left, envp, argc);
         }
-        else // Parent process
+        else
         {
             close(fd[1]);
             dup2(fd[0], STDIN_FILENO);
@@ -138,15 +138,15 @@ void process_tree(char **argv, t_btree *node, char **envp, int argc)
             process_tree(argv, node->right, envp, argc);
         }
     }
-    else // This is a leaf node (actual command)
+    else
     {
-        if (node->first_cmd == 1) // First command
+        if (node->first_cmd == 1)
         {
             int infile = open_file(argv[1], 2);
             dup2(infile, STDIN_FILENO);
             close(infile);
         }
-        else if (node->first_cmd == 2) // Last command
+        else if (node->first_cmd == 2)
         {
             int outfile = open_file(argv[argc - 1], 1);
             dup2(outfile, STDOUT_FILENO);
