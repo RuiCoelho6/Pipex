@@ -1,7 +1,5 @@
 {
 	"files.associations": {
-		"pipex.h": "c",
-		"type_traits": "c",
-		"cstdlib": "c"
+		"libft.h": "c"
 	}
 }
