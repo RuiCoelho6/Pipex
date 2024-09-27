@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/27 16:13:07 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/27 16:55:02 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,66 +109,52 @@ t_btree *build_tree(char **argv, int i, int end)
     return (node);
 }
 
-void    treat_right(char **argv, t_btree *node, char **envp, int *fd)
-{
-    int	outfile;
-
-    dup2(fd[0], STDIN_FILENO);
-	close(fd[0]);
-	while (*argv)
-        argv++;
-    outfile = open_file(*(argv - 1), 1);
-    dup2(outfile, STDOUT_FILENO);
-    close(outfile);
-    close(fd[1]);
-	execute(node->cmd, envp);
-}
-
-void    treat_left(char **argv, t_btree *node, char **envp, int *fd)
-{
-    int		infile;
-
-	dup2(fd[1], STDOUT_FILENO);
-	close(fd[1]);
-	if (node->first_cmd == 1)
-    {
-        infile = open_file(argv[1], 2);
-        dup2(infile, STDIN_FILENO);
-		close(infile);
-    }
-    else
-    {
-        dup2(fd[0], STDIN_FILENO);
-	    close(fd[0]);
-    }
-	execute(node->cmd, envp);
-}
-
-
-
-void process_tree(char **argv, t_btree *node, char **envp)
+void process_tree(char **argv, t_btree *node, char **envp, int argc)
 {
     int fd[2];
-    pid_t pid1;
+    pid_t pid;
 
-	if (pipe(fd) == -1)
-        pipe_error();
-	pid1 = fork();
-	if (pid1 == -1)
-		fork_error();
-	if(pid1 == 0)
-        treat_left(argv, node->left, envp, fd);
-	else
-	{
-		dup2(fd[0], STDIN_FILENO);
-        close(fd[0]);
-        close(fd[1]);
-        if (node->right->cmd == NULL)
-            process_tree(argv, node->right, envp);
+    if (node->cmd == NULL) // This is an internal node
+    {
+        if (pipe(fd) == -1)
+            pipe_error();
+        
+        pid = fork();
+        if (pid == -1)
+            fork_error();
+        
+        if (pid == 0) // Child process
+        {
+            close(fd[0]);
+            dup2(fd[1], STDOUT_FILENO);
+            close(fd[1]);
+            process_tree(argv, node->left, envp, argc);
+        }
+        else // Parent process
+        {
+            close(fd[1]);
+            dup2(fd[0], STDIN_FILENO);
+            close(fd[0]);
+            process_tree(argv, node->right, envp, argc);
+        }
+    }
+    else // This is a leaf node (actual command)
+    {
+        if (node->first_cmd == 1) // First command
+        {
+            int infile = open_file(argv[1], 2);
+            dup2(infile, STDIN_FILENO);
+            close(infile);
+        }
+        else if (node->first_cmd == 2) // Last command
+        {
+            int outfile = open_file(argv[argc - 1], 1);
+            dup2(outfile, STDOUT_FILENO);
+            close(outfile);
+        }
+        execute(node->cmd, envp);
     }
 }
-
-
 
 int main(int argc, char **argv, char **envp)
 {
@@ -176,8 +162,16 @@ int main(int argc, char **argv, char **envp)
 
     if (argc >= 5)
     {
-        root = build_tree(argv, 2, argc - 2);
-        process_tree(argv, root, envp);
+        if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+        {
+            here_doc(argv[2], argc);
+            root = build_tree(argv, 3, argc - 2);
+        }
+        else
+        {
+            root = build_tree(argv, 2, argc - 2);
+        }
+        process_tree(argv, root, envp, argc);
         free_tree(root);
     }
     else
