@@ -114,7 +114,7 @@ void process_tree(char **argv, t_btree *node, char **envp, int argc)
     int fd[2];
     pid_t pid;
 
-    if (node->cmd == NULL) // This is an internal node
+    if (node->cmd == NULL)
     {
         if (pipe(fd) == -1)
             pipe_error();
