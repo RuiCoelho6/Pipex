@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rui <rui@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:41 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/19 20:23:35 by rui              ###   ########.fr       */
+/*   Updated: 2024/09/30 15:41:52 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ char	**get_paths_from_env(char **envp)
 	}
 	if (!envp[i] || space_only == 1)
 		return (NULL);
-	return pipex_split(envp[i] + 5, ':');
+	return (pipex_split(envp[i] + 5, ':'));
 }
 
 char	*build_and_check_path(char *path, char *cmd)
@@ -36,23 +36,22 @@ char	*build_and_check_path(char *path, char *cmd)
 	char	*full_path;
 
 	part_path = ft_strjoin(path, "/");
-
 	full_path = ft_strjoin(part_path, cmd);
 	free(part_path);
 	if (access(full_path, F_OK) == 0)
-		return full_path;
+		return (full_path);
 	free(full_path);
-	return NULL;
+	return (NULL);
 }
 
-char *find_path(char *cmd, char **envp)
+char	*find_path(char *cmd, char **envp)
 {
-	char **paths;
-	char *path;
-	int i;
+	char	**paths;
+	char	*path;
+	int		i;
 
 	paths = get_paths_from_env(envp);
-	if(!paths)
+	if (!paths)
 		return (NULL);
 	i = -1;
 	while (paths[++i])
@@ -63,16 +62,15 @@ char *find_path(char *cmd, char **envp)
 			while (paths[i])
 				free(paths[i++]);
 			free(paths);
-			return path;
+			return (path);
 		}
 	}
 	i = -1;
 	while (paths[++i])
-		free(paths[i]);
-	free(paths);
-	return NULL;
+		free (paths[i]);
+	free (paths);
+	return (NULL);
 }
-
 
 void	execute(char *argv, char **envp)
 {

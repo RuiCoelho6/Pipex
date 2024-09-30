@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:26 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/30 14:56:52 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/30 15:43:13 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	child_process(char **argv, char **envp, int *fd)
 {
-	int		filein;
+	int	filein;
 
 	filein = open(argv[1], O_RDONLY, 0777);
 	if (filein == -1)
