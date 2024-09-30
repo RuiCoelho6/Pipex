@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:31:46 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/27 16:55:02 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/30 14:54:50 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ t_btree *build_tree(char **argv, int i, int end)
     return (node);
 }
 
-void process_tree(char **argv, t_btree *node, char **envp, int argc)
+void process_tree(char **argv, int argc, t_btree *node, char **envp)
 {
     int fd[2];
     pid_t pid;
@@ -128,14 +128,14 @@ void process_tree(char **argv, t_btree *node, char **envp, int argc)
             close(fd[0]);
             dup2(fd[1], STDOUT_FILENO);
             close(fd[1]);
-            process_tree(argv, node->left, envp, argc);
+            process_tree(argv, argc, node->left, envp);
         }
         else
         {
             close(fd[1]);
             dup2(fd[0], STDIN_FILENO);
             close(fd[0]);
-            process_tree(argv, node->right, envp, argc);
+            process_tree(argv, argc, node->right, envp);
         }
     }
     else
@@ -159,6 +159,7 @@ void process_tree(char **argv, t_btree *node, char **envp, int argc)
 int main(int argc, char **argv, char **envp)
 {
     t_btree *root;
+    pid_t   pid;
 
     if (argc >= 5)
     {
@@ -168,10 +169,11 @@ int main(int argc, char **argv, char **envp)
             root = build_tree(argv, 3, argc - 2);
         }
         else
-        {
             root = build_tree(argv, 2, argc - 2);
-        }
-        process_tree(argv, root, envp, argc);
+        pid = fork();
+        if (pid == 0)
+            process_tree(argv, argc, root, envp);
+        waitpid(pid, NULL, 0);
         free_tree(root);
     }
     else

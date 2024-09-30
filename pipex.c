@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:26 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/17 12:13:43 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/30 14:56:52 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	int		fd[2];
 	pid_t	pid1;
+	pid_t	pid2;
 
 	if (argc == 5)
 	{
@@ -54,7 +55,13 @@ int	main(int argc, char **argv, char **envp)
 		if (pid1 == 0)
 			child_process(argv, envp, fd);
 		waitpid(pid1, NULL, WNOHANG);
-		parent_process(argv, envp, fd);
+		pid2 = fork();
+		if (pid2 == -1)
+			fork_error();
+		if (pid2 == 0)
+			parent_process(argv, envp, fd);
+		waitpid(pid2, NULL, 0);
+		return (0);
 	}
 	else
 	{
