@@ -6,7 +6,7 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:26 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/30 15:43:13 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/09/30 16:59:21 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,34 +39,37 @@ void	parent_process(char **argv, char **envp, int *fd)
 	execute(argv[3], envp);
 }
 
-int	main(int argc, char **argv, char **envp)
+void	processes(int *fd, char **argv, char **envp)
 {
-	int		fd[2];
 	pid_t	pid1;
 	pid_t	pid2;
 
-	if (argc == 5)
-	{
-		if (pipe(fd) == -1)
-			pipe_error();
-		pid1 = fork();
-		if (pid1 == -1)
-			fork_error();
-		if (pid1 == 0)
-			child_process(argv, envp, fd);
-		waitpid(pid1, NULL, WNOHANG);
-		pid2 = fork();
-		if (pid2 == -1)
-			fork_error();
-		if (pid2 == 0)
-			parent_process(argv, envp, fd);
-		waitpid(pid2, NULL, 0);
-		return (0);
-	}
-	else
+	pid1 = fork();
+	if (pid1 == -1)
+		fork_error();
+	if (pid1 == 0)
+		child_process(argv, envp, fd);
+	waitpid(pid1, NULL, WNOHANG);
+	pid2 = fork();
+	if (pid2 == -1)
+		fork_error();
+	if (pid2 == 0)
+		parent_process(argv, envp, fd);
+	wait(NULL);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	int	fd[2];
+
+	if (argc != 5)
 	{
 		ft_putstr_fd("Error: Bad arguments\n", 2);
 		ft_putstr_fd("Ex: ./pipex <file1> <cmd1> <cmd2> <file2>\n", 2);
+		return (1);
 	}
+	if (pipe(fd) == -1)
+		pipe_error();
+	processes(fd, argv, envp);
 	return (0);
 }

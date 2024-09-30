@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rui <rui@student.42.fr>                    +#+  +:+       +#+         #
+#    By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/05 14:30:17 by rpires-c          #+#    #+#              #
-#    Updated: 2024/09/22 20:31:20 by rui              ###   ########.fr        #
+#    Updated: 2024/09/30 16:42:16 by rpires-c         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ RM = rm -f
 SRCS = pipex.c utils.c error_warnings.c pipex_split.c
 OBJS = ${SRCS:.c=.o}
 
-SRCS_B = pipex_bonus.c utils_bonus.c utils.c error_warnings.c pipex_split.c
+SRCS_B = pipex_bonus.c utils_bonus.c utils.c error_warnings.c pipex_split.c tree_functions.c
 OBJS_B = ${SRCS_B:.c=.o}
 
 CC = cc -g
