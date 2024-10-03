@@ -6,12 +6,13 @@
 /*   By: rpires-c <rpires-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 14:30:31 by rpires-c          #+#    #+#             */
-/*   Updated: 2024/09/30 16:44:31 by rpires-c         ###   ########.fr       */
+/*   Updated: 2024/10/03 15:43:52 by rpires-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
+# define BUFFER_SIZE 10000
 
 # include <stdlib.h>
 # include <unistd.h>
@@ -35,7 +36,7 @@ void	open_file_error(void);
 void	command_error(void);
 void	no_path_error(char *cmd);
 char	*find_path(char *cmd, char **envp);
-int		get_next_line(char **line);
+void	here_doc(char *limiter);
 void	execute(char *argv, char **envp);
 int		open_file(char *argv, int i);
 char	**pipex_split(char const *s, char c);
